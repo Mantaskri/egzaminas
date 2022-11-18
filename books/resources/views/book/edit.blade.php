@@ -1,48 +1,65 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Edit {{$book->name}}</div>
-                <div class="card-body">
-                    <form class="d-flex flex-column align-items-center" method="post" action="{{route('book.update',$book)}}" enctype="multipart/form-data">
-                        <div class="col-md-4 ms-3 mb-3">
-                            Name: <input class="ms-3 mt-3" type="text" name="book_name" value="{{$book->name}}"><br>
-                            Price: <input class="ms-3 mt-3" type="text" name="book_price" value="{{$book->price}}"><br>
-                            Reservation time: <input class="ms-3 mt-3" type="text" name="book_reservation_time" value="{{$book->reservation_time}}"><br>
-                            <select class="mt-3" name="category_id">
+    <div class="container">
+        <div class="row justify-contnent-center">
+            <div class="col-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Edit Book</h2>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('b_store') }}" method="post" enctype="multipart/form-data">
+                            @csrf
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Title</span>
+                                <input value="{{ old('title', $book->title) }}" type="text" class="form-control" name="title">
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">ISBN</span>
+                                <input value="{{ old('isbn', $book->isbn) }}" type="text" class="form-control" name="isbn">
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Pages count</span>
+                                <input value="{{ old('pages', $book->pages) }}" type="number" class="form-control" name="pages">
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Description</span>
+                                <textarea name="description" cols="30" rows="10">{{ old('description', $book->description) }}</textarea>
+                            </div>
+                            <select class="form-select mb-3" name="category_id">
+                                <option selected value="0">Choose category</option>
                                 @foreach ($categories as $category)
-                                <option value="{{$category->id}}" @if($category->id == $book->category_id) selected @endif>
-                                    {{$category->name}}
-                                </option>
+                                    <option value="{{ old('category_id', $book->category_id) }}" @if ($category->id == old('category_id')) selected @endif>
+                                        {{ $category->title }}</option>
                                 @endforeach
                             </select>
-                            @if($book->photo)
-                            <div class="image-box mt-3 me-3">
-                                <img src="{{$book->photo}}">
+                            <div class="img-small-ch mt-3">
+                                @forelse($book->getPhotos as $photo)
+                                    <div class="image">
+                                        <label for="{{ $photo->id }}-del-photo">
+                                            X
+                                        </label>
+                                        <input type="checkbox" value="{{ $photo->id }}"
+                                            id="{{ $photo->id }}-del-photo" name="delete_photo[]">
+                                        <img src="{{ $photo->url }}" alt="photo">
+                                    </div>
+                                @empty
+                                    <div class="img-small mt-3">
+                                        <h5>// Book has no images</h5>
+                                    </div>
+                                @endforelse
                             </div>
-                            @endif
-                            <div class="form-group mt-2">
-                                <label>Photo of the Book</label>
-                                <input class="form-control" type="file" name="book_photo" />
-                            </div>
-                        </div>
-                        @csrf
-                        @method('put')
-                        <button class="btn btn-outline-success mt-3 mb-3" type="submit">Save</button>
-                    </form>
-                    @if($book->photo)
-                    <form class="d-flex flex-column align-items-center" action="{{route('books.delete-picture', $book)}}" method="post">
-                        @csrf
-                        @method('put')
-                        <button class="btn btn-outline-danger mt-4" type="submit">Delete picture</button>
-                    </form>
-                    @endif
+
+                            <button type="submit" class="btn btn-primary mt-4">Update</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
+
+
+
+
